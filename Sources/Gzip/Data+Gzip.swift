@@ -218,7 +218,7 @@ extension Data {
     ///
     /// - Returns: Gzip-decompressed `Data` instance.
     /// - Throws: `GzipError`
-    public func gunzipped() throws -> Data {
+    public func gunzipped(allowPartialData: Bool = false) throws -> Data {
         
         guard !self.isEmpty else {
             return Data()
@@ -265,7 +265,7 @@ extension Data {
             
         } while status == Z_OK
         
-        guard inflateEnd(&stream) == Z_OK, status == Z_STREAM_END else {
+        guard inflateEnd(&stream) == Z_OK, status == Z_STREAM_END || (allowPartialData && status == Z_BUF_ERROR) else {
             // inflate returns:
             // Z_DATA_ERROR   The input data was corrupted (input stream not conforming to the zlib format or incorrect check value).
             // Z_STREAM_ERROR The stream structure was inconsistent (for example if next_in or next_out was NULL).
